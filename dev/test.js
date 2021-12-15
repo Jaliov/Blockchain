@@ -24,7 +24,7 @@ const currentBlockData = [
 ];
 
 // console.log(bitcoin.proofOfWork(previousBlockHash, currentBlockData));
-// console.log("This is the one that will make you lot's of $$ to buy candy:")
+console.log("This is the one that will make you lot's of $$ to buy candy: " + bitcoin.hashBlock(previousBlockHash, currentBlockData, 5733));
 // console.log(bitcoin.hashBlock(previousBlockHash, currentBlockData, 5733));
 
 
