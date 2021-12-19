@@ -15,7 +15,6 @@ Blockchain.prototype.createNewBlock = function(nonce, previousBlockHash, hash) {
         nonce: nonce, //nonce is a number, proof that we created a new block in a legit way
         hash: hash, 
         previousBlockHash: previousBlockHash
-
     };
 
     this.pendingTransactions = [];
@@ -52,7 +51,7 @@ Blockchain.prototype.proofOfWork = function(previousBlockHash, currentBlockData)
     while (hash.substring(0, 4) !== '0000'){
         nonce++;
         hash = this.hashBlock(previousBlockHash, currentBlockData, nonce);
-        console.log("hash : " + hash)
+         console.log("hash : " + hash)
     }
 
     return nonce;
