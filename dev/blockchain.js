@@ -1,8 +1,12 @@
 const sha256 = require('sha256')
+const currentNodeUrl = process.argv[3];
 
 function Blockchain () {
     this.chain = [];
     this.pendingTransactions = [];
+ 
+    this.currentNodeUrl = currentNodeUrl;
+    this.networkNodes = []; //every node will be aware of all the other nodes
     
     this.createNewBlock(100, '0', '0') //Genesis block
 }
@@ -29,6 +33,7 @@ Blockchain.prototype.getLastBlock = function() {
 
 Blockchain.prototype.createNewTransaction = function(amount, sender, recipient) {
     const newTransaction = {
+        note: "Here is your transaction baby!",
         amount: amount, 
         sender: sender,
         recipient: recipient
@@ -51,7 +56,7 @@ Blockchain.prototype.proofOfWork = function(previousBlockHash, currentBlockData)
     while (hash.substring(0, 4) !== '0000'){
         nonce++;
         hash = this.hashBlock(previousBlockHash, currentBlockData, nonce);
-         console.log("hash : " + hash)
+        //  console.log("hash : " + hash)
     }
 
     return nonce;
