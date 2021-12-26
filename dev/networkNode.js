@@ -5,7 +5,9 @@ const Blockchain = require("./blockchain");
 const { v4: uuidv4 } = require('uuid');
 const port = process.argv[2];
 //The process. argv property is an inbuilt application programming interface of the process module which is used to get the arguments passed to the node. js process when run in the command line. Syntax: process.argv
-const rp = require('request-promise')
+const rp = require('request-promise');
+const req = require("express/lib/request");
+const res = require("express/lib/response");
 
 const nodeAddress = uuidv4().split('-').join('');
 
@@ -89,15 +91,24 @@ app.post('.register-and-broadcast-node', function(req, res) {
     
 });
 
-
 app.post('/register-node', (req, res) => {
-   
+   const newNodeUrl = req.body.newNodeUrl; 
+   const nodeNotAlreadyPresent = bitcoin.networkNodes.indexOf(newNodeUrl) == -1
+  const notCurrentNode = bitcoin.currentNodeUrl !== newNodeUrl;
+   nodeNotAlreadyPresent && notCurrentNode ? bitcoin.networkNodes.push(newNodeUrl) : console.log('Not doing it');
+   res.json({ note: 'New node registered successfully.'})
 });
 
 //register multiple nodes at wonce
-app.post('/register-nodes-bulk', () => {
-
-})
+app.post('/register-nodes-bulk', (req, res) => {
+  const allNetworkNodes = req.body.allNetworkNodes;
+  allNetworkNodes.forEach(networkNodeUrl => {
+    const nodeNotAlreadyPresent = bitcoin.networkNodes.indexOf(networkNodeUrl) == -1
+    const notCurrentNode = bitcoin.currentUrl !== networkNodeUrl;
+    nodeNotAlreadyPresent && notCurrentNode? bitcoin.networkNodes.push(networkNodeUrl) : console.log('Already present'); 
+  })
+    res.json({ note: 'Bulk registration successful!'});
+}); 
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}...`);
