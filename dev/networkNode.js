@@ -21,15 +21,33 @@ app.get('/blockchain', (req, res) => {
   res.send(bitcoin);
 });
 
-app.post("/transaction", (req, res) => {
-  console.log(req.body);
-  let rbdy = req.body;
-  const blockIndex = bitcoin.createNewTransaction(
-    rbdy.amount,
-    rbdy.sender,
-    rbdy.recipient
-  );
-  res.json({ note: `Transaction will be added in block ${blockIndex}.` });
+let rbdy = req.body;
+
+app.post('/transaction', (req, res) => {
+    const newTransaction = req.body;
+    const blockIndex = bitcoin.addTransactionToPendingTransactions(newTransaction);
+    res.json({ note: `Transaction will be added in block ${blockIndex}!`})
+});
+
+app.post('/transaction/broadcast', (req, res) => {
+   const newTransaction = bitcoin.createNewTransaction(req.body.amount, req.body.sender, req.body.recipient)
+   bitcoin.addTransactionToPendingTransactions(newTransaction);
+
+   const requestPromises = [];
+   bitcoin.networkNodes.forEach(networkNodeUrl => {
+      const requestOptions = {
+        uri: networkNodeUrl + '/transaction',
+        method: 'POST',
+        body: newTransaction,
+        json: true,
+      }; //broadcast transaction to all other nodes at their '/transaction' endpoint, cycle. After createing all requests run them with Promise.All 
+
+      requestPromises.push(rp(requestOptions));   
+   });
+  Promise.all(requestPromises).
+  then(data => {
+    res.json({ note: 'Transaction created and broadcast successfully!'})
+  });
 });
 
 app.get('/mine', (req, res) => {
@@ -63,12 +81,11 @@ app.post('/register-and-broadcast-node', function(req, res) {
     const regNodesPromises = [];
     bitcoin.networkNodes.forEach(networkNodeUrl => {
        const requestOptions = {
-         uri: networkNodeUrl + '/register-node',  //make request to each node, async
+         uri: networkNodeUrl + '/transaction',  //make request to each node, async
          method: 'POST',
-         body: { newNodeUrl: newNodeUrl },
+         body: {newNodeUrl: newNodeUrl},
          json: true
        }
-
        regNodesPromises.push(rp(requestOptions));
     });
 
