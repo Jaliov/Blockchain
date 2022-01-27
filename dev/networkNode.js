@@ -6,8 +6,9 @@ const { v4: uuidv4 } = require('uuid');
 const port = process.argv[2];
 //The process. argv property is an inbuilt application programming interface of the process module which is used to get the arguments passed to the node. js process when run in the command line. Syntax: process.argv
 const rp = require('request-promise');
-// const req = require("express/lib/request");
-// const res = require("express/lib/response");
+const res = require("express/lib/response");
+
+// const req = require("express/lib/request")
 
 const nodeAddress = uuidv4().split('-').join('');
 
@@ -20,8 +21,6 @@ app.get('/blockchain', function(req, res) {
     // console.log(req.body);
   res.send(bitcoin);
 });
-
-// let rbdy = req.body;
 
 app.post('/transaction', function(req, res) {
    const newTransaction = req.body;
@@ -248,6 +247,12 @@ app.get('/address/:address', function(req, res) {
   })
 
 });
+
+app.get('/block-explorer', function(req, res) {
+  res.sendFile('./block-explorer/index.html', { root: __dirname });
+  
+})
+
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}...`);
